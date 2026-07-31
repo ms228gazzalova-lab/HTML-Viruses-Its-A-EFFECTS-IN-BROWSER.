@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>5: Scanline Jitter</title>
+    <style>body,html{margin:0;padding:0;overflow:hidden;background:#000;}canvas{display:block;width:100vw;height:100vh;}.back{position:absolute;top:20px;right:20px;color:#fff;background:#3b82f6;padding:10px;text-decoration:none;font-family:sans-serif;font-weight:bold;border-radius:4px;z-index:1000;}</style>
+</head>
+<body>
+    <a href="index.html" class="back">← НАЗАД В МЕНЮ</a>
+    <canvas id="c"></canvas>
+    <script>
+        const canvas = document.getElementById('c'), ctx = canvas.getContext('2d');
+        let w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
+        const mem = document.createElement('canvas'), mCtx = mem.getContext('2d');
+        mem.width = w; mem.height = h;
+        function base() { ctx.fillStyle = '#0b0f19'; ctx.fillRect(0,0,w,h); ctx.strokeStyle = '#00ffcc'; ctx.lineWidth = 3; ctx.strokeRect(w/2-100, h/2-100, 200, 200); mCtx.drawImage(canvas, 0, 0); }
+        base(); window.addEventListener('click', (e) => { if(e.target.className!=='back') base(); });
+        window.addEventListener('resize', () => { w=canvas.width=mem.width=window.innerWidth; h=canvas.height=mem.height=window.innerHeight; base(); });
+        function loop() {
+            ctx.fillStyle = '#000'; ctx.fillRect(0,0,w,h); let time = Date.now() * 0.04;
+            for (let i = 0; i < h; i += 4) {
+                let jitter = Math.sin(time + i * 0.08) * 12 + (Math.random() * 4 - 2);
+                if (Math.random() > 0.98) jitter *= 4;
+                ctx.drawImage(mem, 0, i, w, 4, jitter, i, w, 4);
+            }
+            requestAnimationFrame(loop);
+        }
+        loop();
+    </script>
+</body>
+</html>
