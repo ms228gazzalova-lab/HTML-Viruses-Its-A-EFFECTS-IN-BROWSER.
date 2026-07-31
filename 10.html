@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>10: Total Core Annihilation</title>
+    <style>body,html{margin:0;padding:0;overflow:hidden;background:#000;}canvas{display:block;width:100vw;height:100vh;}.back{position:absolute;top:20px;right:20px;color:#fff;background:#ff0055;padding:10px;text-decoration:none;font-family:sans-serif;font-weight:bold;border-radius:4px;z-index:1000;}</style>
+</head>
+<body>
+    <a href="index.html" class="back">← НАЗАД В МЕНЮ</a>
+    <canvas id="c"></canvas>
+    <script>
+        const canvas = document.getElementById('c'), ctx = canvas.getContext('2d');
+        let w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
+        const mem = document.createElement('canvas'), mCtx = mem.getContext('2d');
+        mem.width = w; mem.height = h;
+        function base() { ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, w, h); ctx.strokeStyle = '#f43f5e'; ctx.lineWidth = 4; ctx.strokeRect(w/2-150, h/2-150, 300, 300); mCtx.drawImage(canvas, 0, 0); }
+        base(); window.addEventListener('click', (e) => { if(e.target.className!=='back') base(); });
+        window.addEventListener('resize', () => { w=canvas.width=mem.width=window.innerWidth; h=canvas.height=mem.height=window.innerHeight; base(); });
+        let last = performance.now();
+        function loop(now) {
+            let dt = (now - last) / (1000 / 60); if(isNaN(dt) || dt > 3) dt = 1; last = now;
+            mCtx.drawImage(canvas, 0, 0);
+            ctx.save(); ctx.translate(w / 2, h / 2); ctx.rotate(-0.025 * dt); ctx.scale(Math.pow(1.015, dt), Math.pow(1.015, dt)); ctx.translate(-w / 2, -h / 2);
+            ctx.drawImage(mem, 0, 0); ctx.restore();
+            if (Math.random() > 0.8) { ctx.fillStyle = '#000000'; ctx.fillRect(Math.random()*(w-150), Math.random()*(h-150), 150, 150); }
+            for(let i = 0; i < 15; i++) { ctx.fillStyle = Math.random() > 0.5 ? '#fff' : '#f43f5e'; ctx.fillRect(Math.random() * w, Math.random() * h, Math.random() * 60, 2); }
+            requestAnimationFrame(loop);
+        }
+        requestAnimationFrame(loop);
+    </script>
+</body>
+</html>
