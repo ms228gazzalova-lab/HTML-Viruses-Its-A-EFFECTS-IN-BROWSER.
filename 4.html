@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>4: Bouncing Boxes</title>
+    <style>body,html{margin:0;padding:0;overflow:hidden;background:#000;}canvas{display:block;width:100vw;height:100vh;}.back{position:absolute;top:20px;right:20px;color:#fff;background:#3b82f6;padding:10px;text-decoration:none;font-family:sans-serif;font-weight:bold;border-radius:4px;z-index:1000;}</style>
+</head>
+<body>
+    <a href="index.html" class="back">← НАЗАД В МЕНЮ</a>
+    <canvas id="c"></canvas>
+    <script>
+        const canvas = document.getElementById('c'), ctx = canvas.getContext('2d');
+        let w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
+        const mem = document.createElement('canvas'), mCtx = mem.getContext('2d');
+        mem.width = w; mem.height = h;
+        function base() { [ctx, mCtx].forEach(c => { c.fillStyle = '#020617'; c.fillRect(0,0,w,h); c.fillStyle = '#10b981'; c.fillRect(w/2-150, h/2-50, 300, 100); }); }
+        const boxes = []; for(let i=0; i<6; i++) { boxes.push({x:w/2, y:h/2, vx:Math.random()*6+4, vy:Math.random()*6+4, size:50, hue:Math.random()*360}); }
+        base(); window.addEventListener('click', (e) => { if(e.target.className!=='back') base(); });
+        window.addEventListener('resize', () => { w=canvas.width=mem.width=window.innerWidth; h=canvas.height=mem.height=window.innerHeight; base(); });
+        let last = performance.now();
+        function loop(now) {
+            let dt = (now - last) / (1000 / 60); if(isNaN(dt) || dt > 3) dt = 1; last = now;
+            mCtx.drawImage(canvas, 0, 0);
+            boxes.forEach(b => {
+                b.x += b.vx * dt; b.y += b.vy * dt;
+                if(b.x <= 0 || b.x + b.size >= w) b.vx *= -1; if(b.y <= 0 || b.y + b.size >= h) b.vy *= -1;
+                ctx.save(); ctx.globalCompositeOperation = 'difference'; ctx.fillStyle = `hsl(${b.hue}, 100%, 50%)`;
+                ctx.fillRect(b.x, b.y, b.size, b.size); ctx.restore();
+            });
+            requestAnimationFrame(loop);
+        }
+        requestAnimationFrame(loop);
+    </script>
+</body>
+</html>
