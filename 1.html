@@ -2,8 +2,12 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>2: Sinewaves Melt</title>
-    <style>body,html{margin:0;padding:0;overflow:hidden;background:#000;}canvas{display:block;width:100vw;height:100vh;}.back{position:absolute;top:20px;right:20px;color:#fff;background:#3b82f6;padding:10px;text-decoration:none;font-family:sans-serif;font-weight:bold;border-radius:4px;z-index:1000;}</style>
+    <title>1: Ghost Injector</title>
+    <style>
+        body, html { margin: 0; padding: 0; overflow: hidden; background: #0c0f1d; cursor: crosshair; }
+        canvas { display: block; width: 100vw; height: 100vh; }
+        .back { position: absolute; top: 20px; right: 20px; color: #fff; background: #3b82f6; padding: 10px; text-decoration: none; font-family: sans-serif; font-weight: bold; border-radius: 4px; z-index: 1000; }
+    </style>
 </head>
 <body>
     <a href="index.html" class="back">← НАЗАД В МЕНЮ</a>
@@ -13,19 +17,67 @@
         let w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
         const mem = document.createElement('canvas'), mCtx = mem.getContext('2d');
         mem.width = w; mem.height = h;
-        function base() {
-            ctx.fillStyle = '#1e1b4b'; ctx.fillRect(0,0,w,h);
-            ctx.fillStyle = '#00ffcc'; for(let i=0; i<w; i+=40) ctx.fillRect(i, h/2-50, 20, 100);
-            mCtx.drawImage(canvas, 0, 0);
+        
+        let isDraw = false, mx = 0, my = 0;
+
+        function base() { 
+            [ctx, mCtx].forEach(c => { 
+                c.fillStyle = '#0c0f1d'; c.fillRect(0, 0, w, h); 
+                c.strokeStyle = '#1e293b'; 
+                for(let i = 0; i < w; i += 50) { c.beginPath(); c.moveTo(i, 0); c.lineTo(i, h); c.stroke(); } 
+            }); 
         }
-        base(); window.addEventListener('click', (e) => { if(e.target.className!=='back') base(); });
-        window.addEventListener('resize', () => { w=canvas.width=mem.width=window.innerWidth; h=canvas.height=mem.height=window.innerHeight; base(); });
-        let angle = 0;
+        
+        base(); 
+        window.addEventListener('click', (e) => { if(e.target.className !== 'back') base(); });
+        window.addEventListener('mousedown', () => isDraw = true); 
+        window.addEventListener('mouseup', () => isDraw = false);
+        window.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
+        window.addEventListener('resize', () => { w = canvas.width = mem.width = window.innerWidth; h = canvas.height = mem.height = window.innerHeight; base(); });
+        
         function loop() {
-            ctx.fillStyle = '#000'; ctx.fillRect(0,0,w,h); angle += 0.05;
-            for (let i = 0; i < h; i += 6) {
-                let offset = Math.sin(angle + i * 0.02) * 20;
-                ctx.drawImage(mem, 0, i, w, 6, offset, i, w, 6);
+            mCtx.drawImage(canvas, 0, 0);
+            
+            // Если мышка НАЖАТА И УДЕРЖИВАЕТСЯ — спавним лавину ошибок
+            if (isDraw) {
+                ctx.save(); 
+                ctx.translate(mx, my); 
+                ctx.rotate(0.02); 
+                ctx.scale(0.99, 0.99); 
+                ctx.translate(-mx, -my); 
+                ctx.drawImage(mem, 0, 0); 
+                ctx.restore();
+                
+                ctx.save(); 
+                ctx.fillStyle = '#020617'; 
+                ctx.strokeStyle = `hsl(${Math.random() * 360}, 100%, 50%)`; 
+                ctx.lineWidth = 3;
+                
+                let rx = mx + (Math.random() * 40 - 20) - 100;
+                let ry = my + (Math.random() * 40 - 20) - 50;
+                
+                // Рисуем тело фейкового окна ошибки
+                ctx.fillRect(rx, ry, 200, 100); 
+                ctx.strokeRect(rx, ry, 200, 100);
+                
+                // Шапка окна ошибки
+                ctx.fillStyle = ctx.strokeStyle; 
+                ctx.fillRect(rx, ry, 200, 20); 
+                
+                // Белый крестик закрытия
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 12px monospace';
+                ctx.fillText('X', rx + 180, ry + 15);
+                
+                // Текст ошибки внутри
+                ctx.fillText('CRITICAL ERROR', rx + 15, ry + 55);
+                ctx.fillStyle = '#ff0055';
+                ctx.beginPath(); ctx.arc(rx + 150, ry + 50, 8, 0, Math.PI * 2); ctx.fill();
+                
+                ctx.restore();
+            } else {
+                // Если мышка отпущена — плавно закручиваем экран к центру
+                ctx.save(); ctx.translate(w / 2, h / 2); ctx.rotate(0.002); ctx.translate(-w / 2, -h / 2); ctx.drawImage(mem, 0, 0); ctx.restore();
             }
             requestAnimationFrame(loop);
         }
