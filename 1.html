@@ -4,40 +4,15 @@
     <meta charset="UTF-8">
     <title>Hidden GDI System Injector</title>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: #0c0f1d;
-            font-family: 'Courier New', monospace;
-            user-select: none;
-            cursor: crosshair;
-        }
-        canvas {
-            display: block;
-            width: 100vw;
-            height: 100vh;
-        }
-        .info {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: #00ffcc;
-            background: rgba(0,0,0,0.85);
-            padding: 15px;
-            border: 1px solid #00ffcc;
-            border-radius: 4px;
-            pointer-events: none;
-            font-size: 14px;
-            box-shadow: 0 0 15px rgba(0,255,204,0.3);
-            line-height: 1.5;
-            text-transform: uppercase;
-        }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #0c0f1d; font-family: 'Courier New', monospace; user-select: none; cursor: crosshair; }
+        canvas { display: block; width: 100vw; height: 100vh; }
+        .info { position: absolute; top: 20px; left: 20px; color: #00ffcc; background: rgba(0,0,0,0.85); padding: 15px; border: 1px solid #00ffcc; border-radius: 4px; pointer-events: none; font-size: 14px; box-shadow: 0 0 15px rgba(0,255,204,0.3); line-height: 1.5; text-transform: uppercase; z-index: 999; }
+        .back { position: absolute; top: 20px; right: 20px; color: #fff; background: #3b82f6; padding: 10px; text-decoration: none; font-family: sans-serif; font-weight: bold; border-radius: 4px; z-index: 1000; }
     </style>
 </head>
 <body>
+
+    <a href="index.html" class="back">← НАЗАД В МЕНЮ</a>
 
     <div class="info">
         SYSTEM: HIDDEN_PAYLOAD_READY<br>
@@ -76,9 +51,9 @@
 
         drawCleanScreen();
 
-        window.addEventListener('mousedown', () => { isDrawing = true; });
+        window.addEventListener('mousedown', (e) => { if(e.target.className !== 'back') isDrawing = true; });
         window.addEventListener('mouseup', () => { isDrawing = false; });
-        window.addEventListener('dblclick', drawCleanScreen);
+        window.addEventListener('dblclick', (e) => { if(e.target.className !== 'back') drawCleanScreen(); });
         
         window.addEventListener('mousemove', (e) => {
             mouseX = e.clientX;
@@ -88,7 +63,8 @@
         window.addEventListener('resize', () => {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
-            memCanvas.width = width; memCanvas.height = height;
+            memCanvas.width = width;
+            memCanvas.height = height;
             drawCleanScreen();
         });
 
