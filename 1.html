@@ -2,95 +2,149 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>1: Ghost Injector</title>
+    <title>Hidden GDI System Injector</title>
     <style>
-        body, html { margin: 0; padding: 0; overflow: hidden; background: #0c0f1d; cursor: crosshair; }
-        canvas { display: block; width: 100vw; height: 100vh; }
-        .back { position: absolute; top: 20px; right: 20px; color: #fff; background: #3b82f6; padding: 10px; text-decoration: none; font-family: sans-serif; font-weight: bold; border-radius: 4px; z-index: 1000; }
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0c0f1d;
+            font-family: 'Courier New', monospace;
+            user-select: none;
+            cursor: crosshair;
+        }
+        canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+        .info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #00ffcc;
+            background: rgba(0,0,0,0.85);
+            padding: 15px;
+            border: 1px solid #00ffcc;
+            border-radius: 4px;
+            pointer-events: none;
+            font-size: 14px;
+            box-shadow: 0 0 15px rgba(0,255,204,0.3);
+            line-height: 1.5;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
-    <a href="index.html" class="back">← НАЗАД В МЕНЮ</a>
-    <canvas id="c"></canvas>
+
+    <div class="info">
+        SYSTEM: HIDDEN_PAYLOAD_READY<br>
+        ИНСТРУКЦИЯ: ЗАЖМИТЕ ЛЕВОУЮ КНОПКУ МЫШИ И ВОДИТЕ<br>
+        ДВОЙНОЙ КЛИК ДЛЯ ОЧИСТКИ ЭКРАНА
+    </div>
+
+    <canvas id="canvas"></canvas>
+
     <script>
-        const canvas = document.getElementById('c'), ctx = canvas.getContext('2d');
-        let w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
-        const mem = document.createElement('canvas'), mCtx = mem.getContext('2d');
-        mem.width = w; mem.height = h;
-        
-        let isDraw = false, mx = w / 2, my = h / 2; // Координаты по умолчанию в центре
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
 
-        function base() { 
-            [ctx, mCtx].forEach(c => { 
-                c.fillStyle = '#0c0f1d'; c.fillRect(0, 0, w, h); 
-                c.strokeStyle = '#1e293b'; 
-                for(let i = 0; i < w; i += 50) { c.beginPath(); c.moveTo(i, 0); c.lineTo(i, h); c.stroke(); } 
-            }); 
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        const memCanvas = document.createElement('canvas');
+        const mCtx = memCanvas.getContext('2d');
+        memCanvas.width = width;
+        memCanvas.height = height;
+
+        let isDrawing = false;
+        let mouseX = 0;
+        let mouseY = 0;
+
+        function drawCleanScreen() {
+            [ctx, mCtx].forEach(c => {
+                c.fillStyle = '#0c0f1d';
+                c.fillRect(0, 0, width, height);
+                c.strokeStyle = '#1e293b';
+                c.lineWidth = 1;
+                for(let i = 0; i < width; i += 50) { c.beginPath(); c.moveTo(i, 0); c.lineTo(i, height); c.stroke(); }
+                for(let i = 0; i < height; i += 50) { c.beginPath(); c.moveTo(0, i); c.lineTo(width, i); c.stroke(); }
+            });
         }
-        
-        base(); 
-        window.addEventListener('click', (e) => { if(e.target.className !== 'back') base(); });
-        
-        // Отслеживаем координаты мыши ВСЕГДА, даже когда кнопка отпущена
-        window.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
-        
-        window.addEventListener('mousedown', (e) => { if(e.target.className !== 'back') isDraw = true; }); 
-        window.addEventListener('mouseup', () => isDraw = false);
-        window.addEventListener('resize', () => { w = canvas.width = mem.width = window.innerWidth; h = canvas.height = mem.height = window.innerHeight; base(); });
-        
-        let last = performance.now();
 
-        function loop(now) {
-            let dt = (now - last) / (1000 / 60); if(isNaN(dt) || dt > 3) dt = 1; last = now;
+        drawCleanScreen();
+
+        window.addEventListener('mousedown', () => { isDrawing = true; });
+        window.addEventListener('mouseup', () => { isDrawing = false; });
+        window.addEventListener('dblclick', drawCleanScreen);
+        
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            memCanvas.width = width; memCanvas.height = height;
+            drawCleanScreen();
+        });
+
+        let angle = 0;
+
+        function render() {
             mCtx.drawImage(canvas, 0, 0);
-            
-            // ЕСЛИ МЫШКА ЗАЖАТА — лавина бесконечно фигачит по циклу requestAnimationFrame, даже если мышь не двигается!
-            if (isDraw) {
-                ctx.save(); 
-                ctx.translate(mx, my); 
-                ctx.rotate(0.02 * dt); 
-                ctx.scale(Math.pow(0.99, dt), Math.pow(0.99, dt)); 
-                ctx.translate(-mx, -my); 
-                ctx.drawImage(mem, 0, 0); 
-                ctx.restore();
+
+            // Если мышка зажата — активируем взрывной GDI-инжект окон из курсора
+            if (isDrawing) {
+                angle += 0.1;
                 
-                // Генерируем по несколько фейковых окон ошибок ЗА ОДИН КАДР для бешеной скорости
-                for(let k = 0; k < 2; k++) {
-                    ctx.save(); 
-                    ctx.fillStyle = '#020617'; 
-                    ctx.strokeStyle = `hsl(${Math.random() * 360}, 100%, 50%)`; 
-                    ctx.lineWidth = 3;
-                    
-                    // Разброс окон строго вокруг текущей позиции курсора
-                    let rx = mx + (Math.random() * 80 - 40) - 100;
-                    let ry = my + (Math.random() * 80 - 40) - 50;
-                    
-                    ctx.fillRect(rx, ry, 200, 100); 
-                    ctx.strokeRect(rx, ry, 200, 100);
-                    
-                    ctx.fillStyle = ctx.strokeStyle; 
-                    ctx.fillRect(rx, ry, 200, 20); 
-                    
-                    ctx.fillStyle = '#fff';
-                    ctx.font = 'bold 12px monospace';
-                    ctx.fillText('X', rx + 185, ry + 15);
-                    ctx.fillText('SYSTEM ERROR', rx + 10, ry + 15);
-                    
-                    ctx.fillStyle = '#ff0055';
-                    ctx.font = 'bold 11px monospace';
-                    ctx.fillText('CRITICAL_INJECT.EXE', rx + 15, ry + 60);
-                    ctx.beginPath(); ctx.arc(rx + 160, ry + 55, 10, 0, Math.PI * 2); ctx.fill();
-                    ctx.fillStyle = '#fff'; ctx.fillText('!', rx + 158, ry + 59);
-                    
-                    ctx.restore();
-                }
+                ctx.save();
+                // Закручиваем картинку вокруг курсора мыши!
+                ctx.translate(mouseX, mouseY);
+                ctx.rotate(0.02);
+                ctx.scale(0.99, 0.99);
+                ctx.translate(-mouseX, -mouseY);
+                ctx.drawImage(memCanvas, 0, 0);
+                ctx.restore();
+
+                // Спавним фейковое системное окно прямо под курсором
+                ctx.save();
+                ctx.fillStyle = '#020617';
+                ctx.strokeStyle = `hsl(${Math.random()*360}, 100%, 50%)`;
+                ctx.lineWidth = 3;
+                
+                // Окно появляется со случайным микро-сдвигом
+                let rx = mouseX + (Math.random()*40 - 20) - 100;
+                let ry = mouseY + (Math.random()*40 - 20) - 50;
+                
+                ctx.fillRect(rx, ry, 200, 100);
+                ctx.strokeRect(rx, ry, 200, 100);
+                
+                // Шапка окна
+                ctx.fillStyle = ctx.strokeStyle;
+                ctx.fillRect(rx, ry, 200, 20);
+                
+                ctx.fillStyle = '#fff';
+                ctx.font = '11px monospace';
+                ctx.fillText('CRITICAL_INJECT', rx + 10, ry + 14);
+                ctx.restore();
             } else {
-                // Если мышка отпущена — обычный Hydrogen-спираль
-                ctx.save(); ctx.translate(w / 2, h / 2); ctx.rotate(0.002 * dt); ctx.translate(-w / 2, -h / 2); ctx.drawImage(mem, 0, 0); ctx.restore();
+                // Если мышка отпущена — запущенные окна продолжают медленно закручиваться сами по себе
+                ctx.save();
+                ctx.translate(width / 2, height / 2);
+                ctx.rotate(0.002);
+                ctx.translate(-width / 2, -height / 2);
+                ctx.drawImage(memCanvas, 0, 0);
+                ctx.restore();
             }
-            requestAnimationFrame(loop);
+
+            requestAnimationFrame(render);
         }
-        requestAnimationFrame(loop);
+
+        render();
     </script>
 </body>
 </html>
