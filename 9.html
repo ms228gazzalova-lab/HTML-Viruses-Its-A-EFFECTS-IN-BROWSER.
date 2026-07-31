@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>9: Block Glitch</title>
+    <style>body,html{margin:0;padding:0;overflow:hidden;background:#000;}canvas{display:block;width:100vw;height:100vh;}.back{position:absolute;top:20px;right:20px;color:#fff;background:#3b82f6;padding:10px;text-decoration:none;font-family:sans-serif;font-weight:bold;border-radius:4px;z-index:1000;}</style>
+</head>
+<body>
+    <a href="index.html" class="back">← НАЗАД В МЕНЮ</a>
+    <canvas id="c"></canvas>
+    <script>
+        const canvas = document.getElementById('c'), ctx = canvas.getContext('2d');
+        let w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
+        const mem = document.createElement('canvas'), mCtx = mem.getContext('2d');
+        mem.width = w; mem.height = h;
+        function base() { [ctx, mCtx].forEach(c => { c.fillStyle = '#111827'; c.fillRect(0,0,w,h); c.fillStyle = '#10b981'; c.fillRect(w/2-150, h/2-100, 300, 200); }); }
+        base(); window.addEventListener('click', (e) => { if(e.target.className!=='back') base(); });
+        window.addEventListener('resize', () => { w=canvas.width=mem.width=window.innerWidth; h=canvas.height=mem.height=window.innerHeight; base(); });
+        function loop() {
+            mCtx.drawImage(canvas, 0, 0); let size = 120;
+            let sx = Math.random() * (w - size), sy = Math.random() * (h - size);
+            let dx = Math.random() * (w - size), dy = Math.random() * (h - size);
+            ctx.drawImage(canvas, sx, sy, size, size, dx, dy, size, size);
+            requestAnimationFrame(loop);
+        }
+        loop();
+    </script>
+</body>
+</html>
