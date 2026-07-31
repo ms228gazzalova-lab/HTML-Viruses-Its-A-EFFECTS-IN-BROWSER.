@@ -4,25 +4,62 @@
     <meta charset="UTF-8">
     <title>GDI EFFECTS PANEL</title>
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow-x: hidden; background-color: #020208; font-family: 'Courier New', monospace; color: #00ff00; }
-        canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; opacity: 0.3; }
-        .container { position: relative; z-index: 2; max-width: 1000px; margin: 0 auto; padding: 40px 20px; text-align: center; }
-        h1 { font-size: 32px; text-transform: uppercase; letter-spacing: 3px; text-shadow: 0 0 15px #00ff00; margin-bottom: 10px; }
-        .subtitle { color: #888; font-size: 14px; margin-bottom: 40px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; padding: 10px; }
-        .btn { background: rgba(0, 255, 0, 0.05); border: 1px solid #00ff00; color: #00ff00; padding: 15px; font-size: 14px; font-weight: bold; font-family: inherit; cursor: pointer; border-radius: 4px; text-transform: uppercase; transition: all 0.2s ease; box-shadow: 0 0 5px rgba(0, 255, 0, 0.2); text-decoration: none; display: block; }
-        .btn:hover { background: #00ff00; color: #000; box-shadow: 0 0 20px #00ff00; transform: translateY(-2px); }
-        .btn-special { grid-column: 1 / -1; background: rgba(255, 0, 85, 0.1); border-color: #ff0055; color: #ff0055; box-shadow: 0 0 5px rgba(255, 0, 85, 0.2); }
-        .btn-special:hover { background: #ff0055; color: #fff; box-shadow: 0 0 25px #ff0055; }
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            overflow-x: hidden; background-color: #020208;
+            font-family: 'Courier New', monospace; color: #00ff00;
+        }
+        canvas {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh; z-index: 1; opacity: 0.3;
+        }
+        .container {
+            position: relative; z-index: 2; max-width: 1000px;
+            margin: 0 auto; padding: 40px 20px; text-align: center;
+        }
+        h1 {
+            font-size: 32px; text-transform: uppercase; letter-spacing: 3px;
+            text-shadow: 0 0 15px #00ff00; margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #888; font-size: 14px; margin-bottom: 40px;
+        }
+        .grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px; padding: 10px;
+        }
+        .btn {
+            background: rgba(0, 255, 0, 0.05); border: 1px solid #00ff00;
+            color: #00ff00; padding: 15px; font-size: 14px; font-weight: bold;
+            font-family: inherit; cursor: pointer; border-radius: 4px;
+            text-transform: uppercase; transition: all 0.2s ease;
+            box-shadow: 0 0 5px rgba(0, 255, 0, 0.2);
+            text-decoration: none; display: block;
+        }
+        .btn:hover {
+            background: #00ff00; color: #000;
+            box-shadow: 0 0 20px #00ff00; transform: translateY(-2px);
+        }
+        .btn-special {
+            grid-column: 1 / -1; background: rgba(255, 0, 85, 0.1);
+            border-color: #ff0055; color: #ff0055; box-shadow: 0 0 5px rgba(255, 0, 85, 0.2);
+        }
+        .btn-special:hover {
+            background: #ff0055; color: #fff; box-shadow: 0 0 25px #ff0055;
+        }
     </style>
 </head>
 <body>
+
     <canvas id="matrix"></canvas>
+
     <div class="container">
         <h1>HTML GDI EFFECTS PANEL</h1>
         <div class="subtitle">УЛЬТИМАТИВНЫЙ ПАК ИЗ 10 СУПЕР-ПЛАВНЫХ PAYLOAD-ЭФФЕКТОВ ДЛЯ ДЕМОНСТРАЦИИ</div>
+        
         <div class="grid">
-            <a href="1.html" class="btn">Эффект 1: Ghost Injector</a>
+            <!-- Кнопка 1 теперь четко ведет на твой оригинальный Hidden GDI System Injector -->
+            <a href="1.html" class="btn">Эффект 1: GDI Injector</a>
             <a href="2.html" class="btn">Эффект 2: Sinewaves</a>
             <a href="3.html" class="btn">Эффект 3: Pixel Dissolve</a>
             <a href="4.html" class="btn">Эффект 4: Bouncing Boxes</a>
@@ -34,6 +71,7 @@
             <a href="10.html" class="btn btn-special">🔥 Эффект 10: Total Core Annihilation</a>
         </div>
     </div>
+
     <script>
         const canvas = document.getElementById('matrix'), ctx = canvas.getContext('2d');
         let w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
